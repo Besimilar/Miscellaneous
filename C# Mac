@@ -1,0 +1,12 @@
+1. Run C# Code with Yeoman: 
+	
+	links: https://docs.microsoft.com/en-us/aspnet/core/client-side/yeoman
+
+	a. yo aspnet: create project: console application
+	b. cd "Project"
+		b.i copy only XX.cs to this directory
+		b.ii copy project.json: only if configurations(dependencies) exist.
+	c. dotnet restore
+	d. dotnet build (optional, build will also happen when run)
+	e. dotnet run
+

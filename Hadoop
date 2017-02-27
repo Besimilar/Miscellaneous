@@ -1,0 +1,37 @@
+1. Run Hadoop in Pseudo-Distributed Mode: 
+	
+	links: hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation
+		   https://medium.com/@luck/installing-hadoop-2-7-2-on-ubuntu-16-04-3a34837ad2db#.e58ybvszc
+
+	a. $ bin/hdfs namenode -format: format file system
+	b. $ sbin/start-dfs.sh: view http://localhost:50070/
+
+	c. Make the HDFS directories required to execute MapReduce jobs:
+	   $ bin/hdfs dfs -mkdir /user
+  	   $ bin/hdfs dfs -mkdir /user/<username>
+
+  	d. $ sbin/start-yarn.sh: view http://localhost:8088/ 
+
+  	e. ## copy some test input files to HDFS
+	   hdfs dfs -put ~/hadoopXXX/inputLocation(current location) HDFSinputLocation(/user/<username>)
+
+    f. Run Job: 
+       ## run a Hadoop job
+	   $ hadoop jar jarLocation MainClassName /user/<username>input /user/<username>/output args[]
+
+    g. View Output:
+       g.i $ hdfs dfs -cat output/* : view output on hdfs
+
+       g.ii ## copy data from Hadoop to local filesystem first
+
+			hdfs dfs -get /user/<username>/output output
+			cat output/*
+
+2. Compile Java and Run job:
+	
+	2a. $ javac -classpath $Hadoopcore.jar -d $ClassPath JavaFile1.java JavaFile2.java ...
+
+	2b. $ jar cvf $JarFile.jar -C $ClassPath .
+
+	2c. hadoop jar $JarFile.jar $MainClassName Args[] ($inputLocation, $outputLocation)
+

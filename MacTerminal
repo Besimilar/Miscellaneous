@@ -1,0 +1,40 @@
+1. Run C# Code with Yeoman: 
+	
+	links: https://docs.microsoft.com/en-us/aspnet/core/client-side/yeoman
+
+	a. yo aspnet: create project: console application
+	b. cd "Project"
+		b.i copy only XX.cs to this directory
+		b.ii copy project.json: only if configurations(dependencies) exist.
+	c. dotnet restore
+	d. dotnet build (optional, build will also happen when run)
+	e. dotnet run
+
+2. Run Hadoop in Pseudo-Distributed Mode: 
+	
+	links: hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation
+		   https://medium.com/@luck/installing-hadoop-2-7-2-on-ubuntu-16-04-3a34837ad2db#.e58ybvszc
+
+	a. $ bin/hdfs namenode -format: format file system
+	b. $ sbin/start-dfs.sh: view http://localhost:50070/
+
+	c. Make the HDFS directories required to execute MapReduce jobs:
+	   $ bin/hdfs dfs -mkdir /user
+  	   $ bin/hdfs dfs -mkdir /user/<username>
+
+  	d. $ sbin/start-yarn.sh: view http://localhost:8088/ 
+
+  	e. ## copy some test input files to HDFS
+	   hdfs dfs -put ~/hadoopXXX/inputLocation(current location) HDFSinputLocation(/user/<username>)
+
+    f. Run Job: 
+       ## run a Hadoop job
+	   $ hadoop jar jarLocation MainClassName /user/<username>input /user/<username>/output args[]
+
+    g. View Output:
+       g.i $ hdfs dfs -cat output/* : view output on hdfs
+
+       g.ii ## copy data from Hadoop to local filesystem first
+
+			hdfs dfs -get /user/<username>/output output
+			cat output/*
