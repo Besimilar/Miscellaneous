@@ -35,3 +35,17 @@
 
 	2c. hadoop jar $JarFile.jar $MainClassName Args[] ($inputLocation, $outputLocation)
 
+3. List File in HDFS: both, but not understand the details
+	$ hadoop fs -ls </user/XXX>(in your HDFS file System)
+	or 
+	$ hdfs dfs -ls </user/XXX>(in your HDFS file System)
+
+
+Problem: 
+	
+	1. WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable:  
+		https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/NativeLibraries.html:
+			The native hadoop library is supported on *nix platforms only. The library does not to work with Cygwin or the Mac OS X platform.
+
+	2. 
+

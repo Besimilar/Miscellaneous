@@ -1,0 +1,129 @@
+Intall ApacheHive-2.1.1: 
+	
+	https://www.tutorialspoint.com/hive/hive_installation.htm
+	https://cwiki.apache.org/confluence/display/Hive/GettingStarted
+	https://cwiki.apache.org/confluence/display/Hive/HiveDerbyServerMode
+
+
+1. Download Hive-2.1.1 from http://hive.apache.org/downloads.html
+
+	1a. $ tar -xzvf hive-x.y.z.tar.gz
+	1b. $ cd hive-x.y.z
+	1c. $ export HIVE_HOME={{pwd}}
+	1d. $ export PATH=$HIVE_HOME/bin:$PATH
+
+2. Install Hive:
+	
+	2a. Hadoop (be sure to run start-dfs.sh/start-yarn.sh after this step)
+
+		2a.i $ export HADOOP_HOME=<hadoop-install-dir>
+		2a.ii In addition, you must use below HDFS commands to create /tmp and /user/hive/warehouse (aka hive.metastore.warehouse.dir) and set them chmod g+w before you can create a table in Hive: (These folders are not in real local file system. They are in HDFS, so if you are not familliar with them, don't change them.)
+			$ $HADOOP_HOME/bin/hadoop fs -mkdir       /tmp
+			$ $HADOOP_HOME/bin/hadoop fs -mkdir       /user/hive/
+		    $ $HADOOP_HOME/bin/hadoop fs -mkdir       /user/hive/warehouse
+		    $ $HADOOP_HOME/bin/hadoop fs -chmod g+w   /tmp
+		    $ $HADOOP_HOME/bin/hadoop fs -chmod g+w   /user/hive/warehouse
+	
+    2b. Configuring Hive:
+
+    	2b.i in ~/.bash_profile (bashrc file location):
+
+	    	export HIVE_HOME=<HiveLocation>
+			export PATH=$PATH:$HIVE_HOME/bin
+			export CLASSPATH=$CLASSPATH:$HADOOP_HOME/lib/*
+			export CLASSPATH=$CLASSPATH:$HIVE_HOME/lib/*
+
+		2b.ii conf/hive-env.sh:
+
+			export HADOOP_HOME=$HADOOP_HOME
+
+		2b.iii maybe now you can start hive by (without database, not sure this step):
+
+			bin/hive
+
+	2c. Running Hive (use "derby" as database):
+
+		https://cwiki.apache.org/confluence/display/Hive/HiveDerbyServerMode
+
+		2c.i download derby
+
+		2c.ii $ mkdir db-derby-x.x.x-bin/data (in derby folder)
+
+		2c.iii set Environment in ~/.bash_profile (bashrc file location):
+
+			export DERBY_INSTALL=/opt/hadoop/db-derby-10.4.1.3-bin
+			export DERBY_HOME=/opt/hadoop/db-derby-10.4.1.3-bin
+			export HADOOP=/opt/hadoop/hadoop-0.17.2.1/bin/hadoop
+
+
+		2c.iv Starting Derby (By default Derby will create databases in the directory it was started from):
+
+			$ cd $DERBY_HOME/data
+			$ $DERBY_HOME/bin/startNetworkServer
+
+			************ check CLASSPATH, delete old version derbyXXX.jar in all location(hadoop or hive's lib), these old jar will cause error: 
+
+				http://stackoverflow.com/questions/33630571/apache-derby-startup-error-java-lang-securityexception-sealing-violation-packa
+
+		2c.v Configure Hive to Use Network Derby:
+
+			1. $HIVE_HOME/conf/hive-site.xml:
+
+				<property>
+				  <name>javax.jdo.option.ConnectionURL</name>
+				  <value>jdbc:derby://<hostname or IP address where the DerbyNetworkServer could be found>:1527/metastore_db;create=true</value>
+				  <description>JDBC connect string for a JDBC metastore</description>
+				</property>
+				 
+				<property>
+				  <name>javax.jdo.option.ConnectionDriverName</name>
+				  <value>org.apache.derby.jdbc.ClientDriver</value>
+				  <description>Driver class name for a JDBC metastore</description>
+				</property>
+
+				****************
+				replace all ${system:java.io.tmpdir} to /tmp/hive(HDFS)
+
+				https://cwiki.apache.org/confluence/display/Hive/AdminManual+Configuration
+
+				****************
+				replace all ${system:user.name} to ${user.name}: this step is used for mac 
+
+			2. create conf/jpox.properties:
+
+				javax.jdo.PersistenceManagerFactoryClass=org.jpox.PersistenceManagerFactoryImpl
+				org.jpox.autoCreateSchema=false
+				org.jpox.validateTables=false
+				org.jpox.validateColumns=false
+				org.jpox.validateConstraints=false
+				org.jpox.storeManagerType=rdbms
+				org.jpox.autoCreateSchema=true
+				org.jpox.autoStartMechanismMode=checked
+				org.jpox.transactionIsolation=read_committed
+				javax.jdo.option.DetachAllOnCommit=true
+				javax.jdo.option.NontransactionalRead=true
+				javax.jdo.option.ConnectionDriverName=org.apache.derby.jdbc.ClientDriver
+				javax.jdo.option.ConnectionURL=jdbc:derby://<hostname or IP address where the DerbyNetworkServer could be found>:1527/metastore_db;create=true
+				javax.jdo.option.ConnectionUserName=APP
+				javax.jdo.option.ConnectionPassword=mine
+
+
+	2d. Start Hive
+
+		2d.i Starting from Hive 2.1, we need to run the schematool command below as an initialization step. For example, we can use "derby" as db type: 
+
+			$ $HIVE_HOME/bin/schematool -dbType <db type> -initSchema
+ 
+			(if you not initial first, remove metastore_db, stopNetworkServer, and restart it, and try initial again)
+
+		2d. Start Hive
+
+			$ $HIVE_HOME/bin/hive
+
+			hive> show tables; (don't forgt ";")
+
+
+End: Enjoy!!!
+
+
+

@@ -38,3 +38,5 @@
 
 			hdfs dfs -get /user/<username>/output output
 			cat output/*
+
+3. Set Environment: $ nano ~/.bash_profile
