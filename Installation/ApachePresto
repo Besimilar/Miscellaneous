@@ -1,0 +1,56 @@
+Install Apache Presto
+
+	https://prestodb.io/docs/current/installation/deployment.html
+
+1. Download presto
+
+2. Create a data directory outside the installation directory to store logs, etc.
+
+3. Create /etc inside installation directory: to store
+	
+	3a. Node Properties: environmental configuration specific to each node: (create etc/node.properties):
+		node.environment=production
+		node.id=ffffffff-ffff-ffff-ffff-ffffffffffff
+		node.data-dir=/var/presto/data
+
+	3b. JVM Config: command line options for the Java Virtual Machine: (create etc/jvm.config): 
+		-server
+		-Xmx16G
+		-XX:+UseG1GC
+		-XX:G1HeapRegionSize=32M
+		-XX:+UseGCOverheadLimit
+		-XX:+ExplicitGCInvokesConcurrent
+		-XX:+HeapDumpOnOutOfMemoryError
+		-XX:+ExitOnOutOfMemoryError
+
+	3c. Config Properties: configuration for the Presto server: (create etc/config.properties):
+
+		Note: Replace example.net:8080(below) to match the host and port of the Presto coordinator.
+
+		3c.i for coordinator:
+			coordinator=true
+			node-scheduler.include-coordinator=false
+			http-server.http.port=8080
+			query.max-memory=50GB
+			query.max-memory-per-node=1GB
+			discovery-server.enabled=true
+			discovery.uri=http://example.net:8080
+
+		3c.ii for workers:
+			coordinator=false
+			http-server.http.port=8080
+			query.max-memory=50GB
+			query.max-memory-per-node=1GB
+			discovery.uri=http://example.net:8080
+
+		3c.iii for single machine:
+			coordinator=true
+			node-scheduler.include-coordinator=true
+			http-server.http.port=8080
+			query.max-memory=5GB
+			query.max-memory-per-node=1GB
+			discovery-server.enabled=true
+			discovery.uri=http://example.net:8080
+
+	3d. Catalog Properties: configuration for Connectors (data sources): (create etc/catalog/<Connector>.properties) (not sure, but I use "hive" here):
+		connector.name=hive 

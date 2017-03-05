@@ -125,5 +125,13 @@ Intall ApacheHive-2.1.1:
 
 End: Enjoy!!!
 
+How to start next time:
+
+	1. start-dfs.sh
+	2. start-yarn.sh
+	3. startNetworkServer (for derby)
+	4. hive
+
+
 
 
