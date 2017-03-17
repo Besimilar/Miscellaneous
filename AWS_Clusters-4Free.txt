@@ -1,0 +1,301 @@
+Fully Distributed Mode for Hadoop: ###### for each time settings
+	
+	https://letsdobigdata.wordpress.com/2014/01/13/setting-up-hadoop-multi-node-cluster-on-amazon-ec2-part-1/
+
+Note:
+
+1. attach volume: /dev/sda1 
+	************ add tags for every volume!
+
+2. my command Lines:
+
+	NameMode: 
+
+		######
+		$ ssh -i "HadoopYa.pem" ubuntu@ec2-54-186-113-13.us-west-2.compute.amazonaws.com
+		$ sudo hostname ec2-54-186-113-13.us-west-2.compute.amazonaws.com
+
+		######
+		$ sudo vi /etc/hosts
+		172.31.17.26 ec2-54-186-113-13.us-west-2.compute.amazonaws.com
+
+		sudo apt-get update
+		sudo add-apt-repository ppa:webupd8team/java
+		sudo apt-get update
+		sudo apt-get install oracle-java8-installer
+
+		tar -xzvf hadoop-0.20.2.tar.gz
+		mv hadoop-0.20.2 hadoop
+
+		vi .bashrc
+		export HADOOP_CONF=/home/ubuntu/hadoop/conf
+		export HADOOP_PREFIX=/home/ubuntu/hadoop
+
+		# Set JAVA_HOME
+		export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+		# Add Hadoop bin/ directory to path
+		export PATH=$PATH:$HADOOP_PREFIX/bin
+
+		source ~/.bashrc
+		echo $HADOOP_PREFIX
+
+		chmod 644 authorized_keys
+		chmod 400 HadoopYa.pem
+
+		eval `ssh-agent -s`
+		ssh-add HadoopYa.pem
+
+		(keep in mind ssh session will be lost upon shell exit and you have repeat ssh-agent and ssh-add commands)
+
+		vi $HADOOP_CONF/hadoop-env.sh
+		export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+		mkdir hdfstmp
+
+		######
+		vi $HADOOP_CONF/core-site.xml
+
+<configuration>
+
+<property>
+<name>fs.default.name</name>
+<value>hdfs://ec2-54-186-113-13.us-west-2.compute.amazonaws.com:8020</value>
+</property>
+
+<property>
+<name>hadoop.tmp.dir</name>
+<value>/home/ubuntu/hdfstmp</value>
+</property>
+
+</configuration>
+
+		vi $HADOOP_CONF/hdfs-site.xml
+
+<configuration>
+<property>
+<name>dfs.replication</name>
+<value>2</value>
+</property>
+<property>
+<name>dfs.permissions</name>
+<value>false</value>
+</property>
+</configuration>
+	
+		######
+		vi $HADOOP_CONF/mapred-site.xml
+
+<configuration>
+<property>
+<name>mapred.job.tracker</name>
+<value>hdfs://ec2-54-186-113-13.us-west-2.compute.amazonaws.com:8021</value>
+</property>
+
+<!--
+<property>
+<name>mapred.child.java.opts</name>
+<value>-Xmx4096m</value>
+</property>
+-->
+
+</configuration>
+
+		######
+		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-244-76-6.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-244-70-142.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-190-199-47.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+
+		###### (NameNode and SNN)
+		vi $HADOOP_CONF/masters 
+ec2-54-186-113-13.us-west-2.compute.amazonaws.com
+ec2-54-244-76-6.us-west-2.compute.amazonaws.com
+
+		###### (Slave1 and Slave2)
+		vi $HADOOP_CONF/slaves
+ec2-54-244-70-142.us-west-2.compute.amazonaws.com
+ec2-54-190-199-47.us-west-2.compute.amazonaws.com
+
+		###### copy to SNN
+		scp masters slaves ubuntu@ec2-54-244-76-6.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+
+		hadoop namenode -format (only for the first time)
+
+		start-all.sh
+		
+	SNN: 
+		######
+		$ ssh -i "HadoopYa.pem" ubuntu@ec2-54-244-76-6.us-west-2.compute.amazonaws.com
+		4 $ sudo hostname ec2-54-244-76-6.us-west-2.compute.amazonaws.com
+
+		######
+		sudo vi /etc/hosts
+		172.31.18.64 ec2-54-244-76-6.us-west-2.compute.amazonaws.com
+
+		sudo apt-get update
+		sudo add-apt-repository ppa:webupd8team/java
+		sudo apt-get update
+		sudo apt-get install oracle-java8-installer
+
+		tar -xzvf hadoop-0.20.2.tar.gz
+		mv hadoop-0.20.2 hadoop
+
+		vi .bashrc
+
+export HADOOP_CONF=/home/ubuntu/hadoop/conf
+export HADOOP_PREFIX=/home/ubuntu/hadoop
+
+# Set JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+# Add Hadoop bin/ directory to path
+export PATH=$PATH:$HADOOP_PREFIX/bin
+
+		source ~/.bashrc
+		echo $HADOOP_PREFIX
+
+		
+
+	Slave1: 
+		######
+		$ ssh -i "HadoopYa.pem" ubuntu@ec2-54-244-70-142.us-west-2.compute.amazonaws.com
+		$ sudo hostname ec2-54-244-70-142.us-west-2.compute.amazonaws.com
+
+		######
+		$ sudo vi /etc/hosts
+		172.31.27.67 ec2-54-244-70-142.us-west-2.compute.amazonaws.com
+
+		sudo apt-get update
+		sudo add-apt-repository ppa:webupd8team/java
+		sudo apt-get update
+		sudo apt-get install oracle-java8-installer
+
+		tar -xzvf hadoop-0.20.2.tar.gz
+		mv hadoop-0.20.2 hadoop
+
+		vi .bashrc
+
+export HADOOP_CONF=/home/ubuntu/hadoop/conf
+export HADOOP_PREFIX=/home/ubuntu/hadoop
+
+# Set JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+# Add Hadoop bin/ directory to path
+export PATH=$PATH:$HADOOP_PREFIX/bin
+
+		source ~/.bashrc
+		echo $HADOOP_PREFIX
+
+		vi $HADOOP_CONF/masters (delete content)
+
+		######
+		vi $HADOOP_CONF/slaves
+		ec2-54-244-70-142.us-west-2.compute.amazonaws.com
+
+	Slave2: 
+
+		######
+		$ ssh -i "HadoopYa.pem" ubuntu@ec2-54-190-199-47.us-west-2.compute.amazonaws.com
+		$ sudo hostname ec2-54-190-199-47.us-west-2.compute.amazonaws.com
+		
+		######
+		$ sudo vi /etc/hosts
+		172.31.25.54 ec2-54-190-199-47.us-west-2.compute.amazonaws.com
+
+		sudo apt-get update
+		sudo add-apt-repository ppa:webupd8team/java
+		sudo apt-get update
+		sudo apt-get install oracle-java8-installer
+
+		tar -xzvf hadoop-0.20.2.tar.gz
+		mv hadoop-0.20.2 hadoop
+
+		vi .bashrc
+		export HADOOP_CONF=/home/ubuntu/hadoop/conf
+		export HADOOP_PREFIX=/home/ubuntu/hadoop
+
+		# Set JAVA_HOME
+		export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+		# Add Hadoop bin/ directory to path
+		export PATH=$PATH:$HADOOP_PREFIX/bin
+
+		source ~/.bashrc
+		echo $HADOOP_PREFIX
+
+		vi $HADOOP_CONF/masters (delete content)
+
+		######
+		vi $HADOOP_CONF/slaves
+		ec2-54-190-199-47.us-west-2.compute.amazonaws.com
+
+
+3. transfer file: using SCP:
+	
+	NameNode:
+		instance ID: i-00f1c77128e5eff90
+		DNS: ec2-54-186-113-13.us-west-2.compute.amazonaws.com
+
+		scp -i HadoopYa.pem input/input.txt ubuntu@ec2-54-186-113-13.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopYa.pem HadoopYa.pem ubuntu@ec2-54-186-113-13.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopYa.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-186-113-13.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopYa.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-244-76-6.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopYa.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-244-70-142.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopYa.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-190-199-47.us-west-2.compute.amazonaws.com:~
+
+
+4. View HDFS:
+
+	###### check status
+	http://ec2-54-186-113-13.us-west-2.compute.amazonaws.com:50070/dfshealth.jsp
+	Check Jobtracker status : http://ec2-54-186-113-13.us-west-2.compute.amazonaws.com:50030/jobtracker.jsp
+
+	###### check slaves status
+	http://ec2-54-244-70-142.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
+	http://ec2-54-190-199-47.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
+
+
+	###### view hdfs (the same, 2 slaves share hdfs)
+	http://ec2-54-244-70-142.us-west-2.compute.amazonaws.com:50075/browseDirectory.jsp?namenodeInfoPort=50070&dir=%2F
+	http://ec2-54-190-199-47.us-west-2.compute.amazonaws.com:50075/browseDirectory.jsp?namenodeInfoPort=50070&dir=%2F
+
+
+
+5. Runjob:
+
+
+
+	ssh -i "HadoopYa.pem" ubuntu@ec2-54-186-113-13.us-west-2.compute.amazonaws.com
+
+	eval `ssh-agent -s`
+	ssh-add HadoopYa.pem
+	(keep in mind ssh session will be lost upon shell exit and you have repeat ssh-agent and ssh-add commands)
+
+
+	ssh -i "HadoopYa.pem" ubuntu@ec2-54-244-76-6.us-west-2.compute.amazonaws.com
+	ssh -i "HadoopYa.pem" ubuntu@ec2-54-244-70-142.us-west-2.compute.amazonaws.com
+	ssh -i "HadoopYa.pem" ubuntu@ec2-54-190-199-47.us-west-2.compute.amazonaws.com
+
+
+	(first time)
+	hadoop namenode -format
+
+	start-all.sh
+
+	(test):
+	hadoop jar hadoop-0.20.2-example.jar pi 10 1000000
+
+	$ hadoop dfs -mkdir /user/<username>/input
+
+	hdfs dfs -put ~/hadoopXXX/inputLocation(current location) HDFSinputLocation(/user/<username>)
+
+	hdfs dfs -get /user/<username>/output output
+	cat output/*	
+
+	or 
+
+	hdfs dfs -cat output/* : view output on hdfs
+		
+
+
