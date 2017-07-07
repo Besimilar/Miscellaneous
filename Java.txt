@@ -1,0 +1,6 @@
+Compile a Java File:
+
+1. mkdir project_classes
+2. javac -classpath xxx.jar -d project_classes xxx.java xxx.java
+3. jar cvf project.jar -C project_classes .
+4. java jar project.jar MainClass args

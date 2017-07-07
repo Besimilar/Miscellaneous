@@ -1,3 +1,16 @@
 1. Copy file between Local System and Docker:
-	1a. docker ps: View Container ID
-	1b. docker cp <Localfile> <Container ID:DockerLocation>
+		1a. docker ps: View Container ID
+		1b. docker cp <Localfile> <Container ID:DockerLocation>
+
+2. Run docker
+		$ docker run -it <Name> /bin/bash
+ 
+3. Run any command in a running container just knowing its ID (or name):
+		$ docker exec -it <container_id_or_name> echo "Hello from container!"
+
+4. If the container is currently stopped, you need to first run it with the following command:
+		$ docker start <container-name/ID>
+		$ docker exec -it <container-name/ID> bash
+
+5. Stop A container:
+		$ docker stop <container-name/ID>

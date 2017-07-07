@@ -12,12 +12,12 @@ Note:
 	NameMode: 
 
 		######
-		$ ssh -i "HadoopNi.pem" ubuntu@ec2-54-203-6-77.us-west-2.compute.amazonaws.com
-		$ sudo hostname ec2-54-203-6-77.us-west-2.compute.amazonaws.com
+		$ ssh -i "HadoopCluster.pem" ubuntu@ec2-54-213-8-62.us-west-2.compute.amazonaws.com
+		$ sudo hostname ec2-54-213-8-62.us-west-2.compute.amazonaws.com
 
 		######
 		$ sudo vi /etc/hosts
-		172.31.17.26 ec2-54-203-6-77.us-west-2.compute.amazonaws.com
+		172.31.46.178 ec2-54-213-8-62.us-west-2.compute.amazonaws.com
 
 		sudo apt-get update
 		sudo add-apt-repository ppa:webupd8team/java
@@ -41,17 +41,17 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 		echo $HADOOP_PREFIX
 
 		chmod 644 authorized_keys
-		chmod 400 HadoopNi.pem
+		chmod 400 HadoopCluster.pem
 
 		eval `ssh-agent -s`
-		ssh-add HadoopNi.pem
+		ssh-add HadoopCluster.pem
 
 		(keep in mind ssh session will be lost upon shell exit and you have repeat ssh-agent and ssh-add commands)
 
 		######
-		ssh ubuntu@ec2-54-203-12-253.us-west-2.compute.amazonaws.com
-		ssh ubuntu@ec2-54-202-174-81.us-west-2.compute.amazonaws.com
-		ssh ubuntu@ec2-54-203-162-182.us-west-2.compute.amazonaws.com
+		ssh ubuntu@ec2-54-202-129-221.us-west-2.compute.amazonaws.com
+		ssh ubuntu@ec2-54-202-185-112.us-west-2.compute.amazonaws.com
+		ssh ubuntu@ec2-54-203-170-68.us-west-2.compute.amazonaws.com
 
 
 
@@ -67,7 +67,7 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 <property>
 <name>fs.default.name</name>
-<value>hdfs://ec2-54-203-6-77.us-west-2.compute.amazonaws.com:8020</value>
+<value>hdfs://ec2-54-213-8-62.us-west-2.compute.amazonaws.com:8020</value>
 </property>
 
 <property>
@@ -82,7 +82,7 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 <configuration>
 <property>
 <name>dfs.replication</name>
-<value>2</value>
+<value>3</value>
 </property>
 <property>
 <name>dfs.permissions</name>
@@ -95,7 +95,7 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 <property>
 <name>mapred.job.tracker</name>
-<value>hdfs://ec2-54-203-6-77.us-west-2.compute.amazonaws.com:8021</value>
+<value>hdfs://ec2-54-213-8-62.us-west-2.compute.amazonaws.com:8021</value>
 </property>
 
 <property>
@@ -120,22 +120,23 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 
 		######
-		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-203-12-253.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
-		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-202-174-81.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
-		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-203-162-182.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-202-129-221.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-202-185-112.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+		scp hadoop-env.sh core-site.xml hdfs-site.xml mapred-site.xml ubuntu@ec2-54-203-170-68.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
 
 		###### (NameNode and SNN)
 		vi $HADOOP_CONF/masters 
-ec2-54-203-6-77.us-west-2.compute.amazonaws.com
-ec2-54-203-12-253.us-west-2.compute.amazonaws.com
+ec2-54-213-8-62.us-west-2.compute.amazonaws.com
+
 
 		###### (Slave1 and Slave2)
 		vi $HADOOP_CONF/slaves
-ec2-54-202-174-81.us-west-2.compute.amazonaws.com
-ec2-54-203-162-182.us-west-2.compute.amazonaws.com
+ec2-54-202-129-221.us-west-2.compute.amazonaws.com
+ec2-54-202-185-112.us-west-2.compute.amazonaws.com
+ec2-54-203-170-68.us-west-2.compute.amazonaws.com
 
 		###### copy to SNN
-		scp masters slaves ubuntu@ec2-54-203-12-253.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
+		scp masters slaves ubuntu@ec2-54-202-129-221.us-west-2.compute.amazonaws.com:/home/ubuntu/hadoop/conf
 
 		hadoop namenode -format (only for the first time)
 
@@ -143,12 +144,12 @@ ec2-54-203-162-182.us-west-2.compute.amazonaws.com
 		
 	SNN: 
 		######
-		$ ssh -i "HadoopNi.pem" ubuntu@ec2-54-203-12-253.us-west-2.compute.amazonaws.com
-		4 $ sudo hostname ec2-54-203-12-253.us-west-2.compute.amazonaws.com
+		$ ssh -i "HadoopCluster.pem" ubuntu@ec2-54-202-129-221.us-west-2.compute.amazonaws.com
+		4 $ sudo hostname ec2-54-202-129-221.us-west-2.compute.amazonaws.com
 
 		######
 		sudo vi /etc/hosts
-		172.31.18.64 ec2-54-203-12-253.us-west-2.compute.amazonaws.com
+		172.31.37.223 ec2-54-202-129-221.us-west-2.compute.amazonaws.com
 
 		sudo apt-get update
 		sudo add-apt-repository ppa:webupd8team/java
@@ -176,12 +177,12 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 	Slave1: 
 		######
-		$ ssh -i "HadoopNi.pem" ubuntu@ec2-54-202-174-81.us-west-2.compute.amazonaws.com
-		$ sudo hostname ec2-54-202-174-81.us-west-2.compute.amazonaws.com
+		$ ssh -i "HadoopCluster.pem" ubuntu@ec2-54-202-185-112.us-west-2.compute.amazonaws.com
+		$ sudo hostname ec2-54-202-185-112.us-west-2.compute.amazonaws.com
 
 		######
 		$ sudo vi /etc/hosts
-		172.31.27.67 ec2-54-202-174-81.us-west-2.compute.amazonaws.com
+		172.31.42.45 ec2-54-202-185-112.us-west-2.compute.amazonaws.com
 
 		sudo apt-get update
 		sudo add-apt-repository ppa:webupd8team/java
@@ -209,17 +210,17 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 		######
 		vi $HADOOP_CONF/slaves
-		ec2-54-202-174-81.us-west-2.compute.amazonaws.com
+		ec2-54-202-185-112.us-west-2.compute.amazonaws.com
 
 	Slave2: 
 
 		######
-		$ ssh -i "HadoopNi.pem" ubuntu@ec2-54-203-162-182.us-west-2.compute.amazonaws.com
-		$ sudo hostname ec2-54-203-162-182.us-west-2.compute.amazonaws.com
+		$ ssh -i "HadoopCluster.pem" ubuntu@ec2-54-203-170-68.us-west-2.compute.amazonaws.com
+		$ sudo hostname ec2-54-203-170-68.us-west-2.compute.amazonaws.com
 		
 		######
 		$ sudo vi /etc/hosts
-		172.31.25.54 ec2-54-203-162-182.us-west-2.compute.amazonaws.com
+		172.31.46.57 ec2-54-203-170-68.us-west-2.compute.amazonaws.com
 
 		sudo apt-get update
 		sudo add-apt-repository ppa:webupd8team/java
@@ -246,37 +247,38 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 		######
 		vi $HADOOP_CONF/slaves
-		ec2-54-203-162-182.us-west-2.compute.amazonaws.com
+		ec2-54-203-170-68.us-west-2.compute.amazonaws.com
 
 
 3. transfer file: using SCP:
 	
 	NameNode:
 		instance ID: i-00f1c77128e5eff90
-		DNS: ec2-54-203-6-77.us-west-2.compute.amazonaws.com
+		DNS: ec2-54-213-8-62.us-west-2.compute.amazonaws.com
 
-		scp -i HadoopNi.pem input/input.txt ubuntu@ec2-54-203-6-77.us-west-2.compute.amazonaws.com:~
-		scp -i HadoopNi.pem HadoopNi.pem ubuntu@ec2-54-203-6-77.us-west-2.compute.amazonaws.com:~
-		scp -i HadoopNi.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-203-6-77.us-west-2.compute.amazonaws.com:~
-		scp -i HadoopNi.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-203-12-253.us-west-2.compute.amazonaws.com:~
-		scp -i HadoopNi.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-202-174-81.us-west-2.compute.amazonaws.com:~
-		scp -i HadoopNi.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-203-162-182.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopCluster.pem input/input.txt ubuntu@ec2-54-213-8-62.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopCluster.pem HadoopCluster.pem ubuntu@ec2-54-213-8-62.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopCluster.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-213-8-62.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopCluster.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-202-129-221.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopCluster.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-202-185-112.us-west-2.compute.amazonaws.com:~
+		scp -i HadoopCluster.pem hadoop-0.20.2.tar.gz ubuntu@ec2-54-203-170-68.us-west-2.compute.amazonaws.com:~
 
 
 4. View HDFS:
 
 	###### check status
-	http://ec2-54-203-6-77.us-west-2.compute.amazonaws.com:50070/dfshealth.jsp
-	Check Jobtracker status : http://ec2-54-203-6-77.us-west-2.compute.amazonaws.com:50030/jobtracker.jsp
+	http://ec2-54-213-8-62.us-west-2.compute.amazonaws.com:50070/dfshealth.jsp
+	Check Jobtracker status : http://ec2-54-213-8-62.us-west-2.compute.amazonaws.com:50030/jobtracker.jsp
 
 	###### check slaves status
-	http://ec2-54-202-174-81.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
-	http://ec2-54-203-162-182.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
+	http://ec2-54-202-129-221.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
+	http://ec2-54-202-185-112.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
+	http://ec2-54-203-170-68.us-west-2.compute.amazonaws.com:50060/tasktracker.jsp
 
 
 	###### view hdfs (the same, 2 slaves share hdfs)
-	http://ec2-54-202-174-81.us-west-2.compute.amazonaws.com:50075/browseDirectory.jsp?namenodeInfoPort=50070&dir=%2F
-	http://ec2-54-203-162-182.us-west-2.compute.amazonaws.com:50075/browseDirectory.jsp?namenodeInfoPort=50070&dir=%2F
+	http://ec2-54-202-185-112.us-west-2.compute.amazonaws.com:50075/browseDirectory.jsp?namenodeInfoPort=50070&dir=%2F
+	http://ec2-54-203-170-68.us-west-2.compute.amazonaws.com:50075/browseDirectory.jsp?namenodeInfoPort=50070&dir=%2F
 
 
 
@@ -284,16 +286,16 @@ export PATH=$PATH:$HADOOP_PREFIX/bin
 
 
 
-	ssh -i "HadoopNi.pem" ubuntu@ec2-54-203-6-77.us-west-2.compute.amazonaws.com
+	ssh -i "HadoopCluster.pem" ubuntu@ec2-54-213-8-62.us-west-2.compute.amazonaws.com
 
 	eval `ssh-agent -s`
-	ssh-add HadoopNi.pem
+	ssh-add HadoopCluster.pem
 	(keep in mind ssh session will be lost upon shell exit and you have repeat ssh-agent and ssh-add commands)
 
 
-	ssh -i "HadoopNi.pem" ubuntu@ec2-54-203-12-253.us-west-2.compute.amazonaws.com
-	ssh -i "HadoopNi.pem" ubuntu@ec2-54-202-174-81.us-west-2.compute.amazonaws.com
-	ssh -i "HadoopNi.pem" ubuntu@ec2-54-203-162-182.us-west-2.compute.amazonaws.com
+	ssh -i "HadoopCluster.pem" ubuntu@ec2-54-202-129-221.us-west-2.compute.amazonaws.com
+	ssh -i "HadoopCluster.pem" ubuntu@ec2-54-202-185-112.us-west-2.compute.amazonaws.com
+	ssh -i "HadoopCluster.pem" ubuntu@ec2-54-203-170-68.us-west-2.compute.amazonaws.com
 
 
 	(first time)
